@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
@@ -9,31 +8,49 @@ import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/splash',
+  initialLocation: '/',
+
   routes: [
     GoRoute(
-      path: '/splash',
-      builder: (context, state) => const SplashPage(),
+      path: '/',
+      builder: (context, state) {
+        return const SplashPage();
+      },
     ),
+
     GoRoute(
       path: '/login',
-      builder: (context, state) => const LoginPage(),
+      builder: (context, state) {
+        return const LoginPage();
+      },
     ),
+
     GoRoute(
       path: '/register',
-      builder: (context, state) => const RegisterPage(),
+      builder: (context, state) {
+        return const RegisterPage();
+      },
     ),
+
     GoRoute(
       path: '/forgot-password',
-      builder: (context, state) => const ForgotPasswordPage(),
+      builder: (context, state) {
+        return const ForgotPasswordPage();
+      },
     ),
+
     GoRoute(
       path: '/dashboard',
-      builder: (context, state) => const DashboardPage(),
+      builder: (context, state) {
+        return const DashboardPage();
+      },
     ),
+
     GoRoute(
       path: '/profile',
-      builder: (context, state) => const ProfilePage(),
+      builder: (context, state) {
+        return const ProfilePage();
+      },
     ),
   ],
 );

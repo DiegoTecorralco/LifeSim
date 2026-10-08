@@ -12,75 +12,125 @@ class ProfilePage extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) {
-    final userState = ref.watch(authProvider);
+    final user = ref.watch(authProvider).value;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mi perfil'),
       ),
-      body: userState.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (error, _) => Center(
-          child: Text(
-            error.toString(),
-          ),
-        ),
-        data: (user) {
-          if (user == null) {
-            return const Center(
-              child: Text(
-                'No hay una sesión activa',
-              ),
-            );
-          }
-
-          return Padding(
-            padding: const EdgeInsets.all(24),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 600,
+            ),
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
               children: [
+                const CircleAvatar(
+                  radius: 55,
+                  backgroundColor: Colors.indigo,
+                  child: Icon(
+                    Icons.person,
+                    size: 60,
+                    color: Colors.white,
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
                 const Text(
-                  'Perfil',
+                  'Mi perfil',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Correo electrónico',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+
+                const SizedBox(height: 30),
+
+                Card(
+                  elevation: 0,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(
+                          Icons.email_outlined,
+                        ),
+                        title: const Text(
+                          'Correo electrónico',
+                        ),
+                        subtitle: Text(
+                          user?.email ??
+                              'No disponible',
+                        ),
+                      ),
+
+                      const Divider(
+                        height: 1,
+                      ),
+
+                      ListTile(
+                        leading: const Icon(
+                          Icons.badge_outlined,
+                        ),
+                        title: const Text(
+                          'ID de usuario',
+                        ),
+                        subtitle: Text(
+                          user?.id ??
+                              'No disponible',
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(user.email),
+
                 const SizedBox(height: 24),
-                Text(
-                  'ID: ${user.id}',
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      context.go('/dashboard');
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back,
+                    ),
+                    label: const Text(
+                      'Volver al dashboard',
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: () async {
-                    await ref
-                        .read(authProvider.notifier)
-                        .logout();
 
-                    if (!context.mounted) return;
+                const SizedBox(height: 12),
 
-                    context.go('/login');
-                  },
-                  child: const Text(
-                    'Cerrar sesión',
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: FilledButton.icon(
+                    onPressed: () async {
+                      await ref
+                          .read(authProvider.notifier)
+                          .logout();
+
+                      if (!context.mounted) return;
+
+                      context.go('/login');
+                    },
+                    icon: const Icon(
+                      Icons.logout,
+                    ),
+                    label: const Text(
+                      'Cerrar sesión',
+                    ),
                   ),
                 ),
               ],
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }

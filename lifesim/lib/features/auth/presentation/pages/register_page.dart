@@ -16,99 +16,214 @@ class _RegisterPageState
     extends ConsumerState<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final confirmPasswordController =
-      TextEditingController();
+  final confirmController = TextEditingController();
 
-  Future<void> register() async {
+  bool obscurePassword = true;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    confirmController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _register() async {
     final email = emailController.text.trim();
-    final password = passwordController.text;
-    final confirmPassword =
-        confirmPasswordController.text;
+    final password = passwordController.text.trim();
+    final confirm = confirmController.text.trim();
 
     if (email.isEmpty ||
         password.isEmpty ||
-        confirmPassword.isEmpty) {
+        confirm.isEmpty) {
+      _showMessage('Completa todos los campos');
       return;
     }
 
-    if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Las contraseñas no coinciden',
-          ),
-        ),
+    if (password.length < 6) {
+      _showMessage(
+        'La contraseña debe tener mínimo 6 caracteres',
       );
       return;
     }
 
-    await ref
-        .read(authProvider.notifier)
-        .register(
+    if (password != confirm) {
+      _showMessage(
+        'Las contraseñas no coinciden',
+      );
+      return;
+    }
+
+    await ref.read(authProvider.notifier).register(
           email: email,
           password: password,
         );
 
-    if (!mounted) return;
-
     final state = ref.read(authProvider);
 
+    if (!mounted) return;
+
     if (state.hasError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            state.error.toString(),
-          ),
-        ),
+      _showMessage(
+        state.error.toString(),
       );
       return;
     }
 
-    context.go('/dashboard');
+    _showMessage(
+      'Cuenta creada correctamente',
+    );
+
+    await Future.delayed(
+      const Duration(seconds: 1),
+    );
+
+    if (!mounted) return;
+
+    context.go('/login');
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Crear cuenta'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            TextField(
-              controller: emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                labelText: 'Correo electrónico',
-              ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 430,
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Contraseña',
-              ),
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.stretch,
+              children: [
+                const Icon(
+                  Icons.person_add_alt_1,
+                  size: 65,
+                  color: Colors.indigo,
+                ),
+
+                const SizedBox(height: 20),
+
+                const Text(
+                  'Crear cuenta',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                const Text(
+                  'Comienza a utilizar LifeSim',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.grey,
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+
+                TextField(
+                  controller: emailController,
+                  keyboardType:
+                      TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: 'Correo electrónico',
+                    prefixIcon:
+                        Icon(Icons.email_outlined),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                TextField(
+                  controller: passwordController,
+                  obscureText: obscurePassword,
+                  decoration: InputDecoration(
+                    labelText: 'Contraseña',
+                    prefixIcon:
+                        const Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          obscurePassword =
+                              !obscurePassword;
+                        });
+                      },
+                      icon: Icon(
+                        obscurePassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                TextField(
+                  controller: confirmController,
+                  obscureText: obscurePassword,
+                  decoration: const InputDecoration(
+                    labelText: 'Confirmar contraseña',
+                    prefixIcon:
+                        Icon(Icons.lock_outline),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                SizedBox(
+                  height: 52,
+                  child: FilledButton(
+                    onPressed: authState.isLoading
+                        ? null
+                        : _register,
+                    child: authState.isLoading
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child:
+                                CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Crear cuenta',
+                          ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                TextButton(
+                  onPressed: () {
+                    context.go('/login');
+                  },
+                  child: const Text(
+                    'Ya tengo una cuenta',
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: confirmPasswordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Confirmar contraseña',
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: register,
-                child: const Text('Registrarme'),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

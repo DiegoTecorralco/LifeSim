@@ -22,14 +22,17 @@ final authProvider =
   AuthNotifier.new,
 );
 
-class AuthNotifier extends Notifier<AsyncValue<User?>> {
+class AuthNotifier
+    extends Notifier<AsyncValue<User?>> {
   late final AuthRepository _repository;
 
   @override
   AsyncValue<User?> build() {
     _repository = ref.read(authRepositoryProvider);
 
-    return const AsyncValue.data(null);
+    return AsyncValue.data(
+      _repository.getCurrentUser(),
+    );
   }
 
   Future<void> register({
@@ -46,7 +49,10 @@ class AuthNotifier extends Notifier<AsyncValue<User?>> {
 
       state = AsyncValue.data(user);
     } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
+      state = AsyncValue.error(
+        e,
+        stackTrace,
+      );
     }
   }
 
@@ -64,7 +70,10 @@ class AuthNotifier extends Notifier<AsyncValue<User?>> {
 
       state = AsyncValue.data(user);
     } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
+      state = AsyncValue.error(
+        e,
+        stackTrace,
+      );
     }
   }
 
@@ -74,7 +83,9 @@ class AuthNotifier extends Notifier<AsyncValue<User?>> {
     state = const AsyncValue.data(null);
   }
 
-  Future<void> resetPassword(String email) async {
+  Future<void> resetPassword(
+    String email,
+  ) async {
     await _repository.resetPassword(email);
   }
 }
