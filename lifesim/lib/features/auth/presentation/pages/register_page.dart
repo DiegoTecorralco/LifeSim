@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../providers/auth_provider.dart';
 
-class RegisterPage extends ConsumerStatefulWidget {
+class RegisterPage
+    extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
   @override
@@ -14,29 +15,57 @@ class RegisterPage extends ConsumerStatefulWidget {
 
 class _RegisterPageState
     extends ConsumerState<RegisterPage> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmController = TextEditingController();
+  final fullNameController =
+      TextEditingController();
+
+  final emailController =
+      TextEditingController();
+
+  final passwordController =
+      TextEditingController();
+
+  final confirmController =
+      TextEditingController();
 
   bool obscurePassword = true;
 
   @override
   void dispose() {
+    fullNameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     confirmController.dispose();
+
     super.dispose();
   }
 
   Future<void> _register() async {
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
-    final confirm = confirmController.text.trim();
+    final fullName =
+        fullNameController.text.trim();
 
-    if (email.isEmpty ||
+    final email =
+        emailController.text.trim();
+
+    final password =
+        passwordController.text.trim();
+
+    final confirm =
+        confirmController.text.trim();
+
+    if (fullName.isEmpty ||
+        email.isEmpty ||
         password.isEmpty ||
         confirm.isEmpty) {
-      _showMessage('Completa todos los campos');
+      _showMessage(
+        'Completa todos los campos',
+      );
+      return;
+    }
+
+    if (fullName.length < 3) {
+      _showMessage(
+        'El nombre completo debe tener al menos 3 caracteres',
+      );
       return;
     }
 
@@ -54,12 +83,16 @@ class _RegisterPageState
       return;
     }
 
-    await ref.read(authProvider.notifier).register(
+    await ref
+        .read(authProvider.notifier)
+        .register(
+          fullName: fullName,
           email: email,
           password: password,
         );
 
-    final state = ref.read(authProvider);
+    final state =
+        ref.read(authProvider);
 
     if (!mounted) return;
 
@@ -83,8 +116,11 @@ class _RegisterPageState
     context.go('/login');
   }
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
+  void _showMessage(
+    String message,
+  ) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
       SnackBar(
         content: Text(message),
       ),
@@ -93,22 +129,28 @@ class _RegisterPageState
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
+    final authState =
+        ref.watch(authProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crear cuenta'),
+        title: const Text(
+          'Crear cuenta',
+        ),
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding:
+              const EdgeInsets.all(24),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(
+            constraints:
+                const BoxConstraints(
               maxWidth: 430,
             ),
             child: Column(
               crossAxisAlignment:
-                  CrossAxisAlignment.stretch,
+                  CrossAxisAlignment
+                      .stretch,
               children: [
                 const Icon(
                   Icons.person_add_alt_1,
@@ -116,50 +158,101 @@ class _RegisterPageState
                   color: Colors.indigo,
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(
+                  height: 20,
+                ),
 
                 const Text(
                   'Crear cuenta',
-                  textAlign: TextAlign.center,
+                  textAlign:
+                      TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                    fontWeight:
+                        FontWeight.bold,
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(
+                  height: 8,
+                ),
 
                 const Text(
-                  'Comienza a utilizar LifeSim',
-                  textAlign: TextAlign.center,
+                  'Crea tu cuenta para comenzar a utilizar LifeSim',
+                  textAlign:
+                      TextAlign.center,
                   style: TextStyle(
                     color: Colors.grey,
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(
+                  height: 32,
+                ),
 
                 TextField(
-                  controller: emailController,
-                  keyboardType:
-                      TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Correo electrónico',
+                  controller:
+                      fullNameController,
+                  textCapitalization:
+                      TextCapitalization
+                          .words,
+                  decoration:
+                      const InputDecoration(
+                    labelText:
+                        'Nombre completo',
+                    hintText:
+                        'Ej. Diego Tecorralco',
                     prefixIcon:
-                        Icon(Icons.email_outlined),
+                        Icon(
+                      Icons
+                          .person_outline,
+                    ),
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(
+                  height: 16,
+                ),
 
                 TextField(
-                  controller: passwordController,
-                  obscureText: obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: 'Contraseña',
+                  controller:
+                      emailController,
+                  keyboardType:
+                      TextInputType
+                          .emailAddress,
+                  decoration:
+                      const InputDecoration(
+                    labelText:
+                        'Correo electrónico',
+                    hintText:
+                        'correo@ejemplo.com',
                     prefixIcon:
-                        const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
+                        Icon(
+                      Icons
+                          .email_outlined,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 16,
+                ),
+
+                TextField(
+                  controller:
+                      passwordController,
+                  obscureText:
+                      obscurePassword,
+                  decoration:
+                      InputDecoration(
+                    labelText:
+                        'Contraseña',
+                    prefixIcon:
+                        const Icon(
+                      Icons.lock_outline,
+                    ),
+                    suffixIcon:
+                        IconButton(
                       onPressed: () {
                         setState(() {
                           obscurePassword =
@@ -168,56 +261,77 @@ class _RegisterPageState
                       },
                       icon: Icon(
                         obscurePassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
+                            ? Icons
+                                .visibility_outlined
+                            : Icons
+                                .visibility_off_outlined,
                       ),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(
+                  height: 16,
+                ),
 
                 TextField(
-                  controller: confirmController,
-                  obscureText: obscurePassword,
-                  decoration: const InputDecoration(
-                    labelText: 'Confirmar contraseña',
+                  controller:
+                      confirmController,
+                  obscureText:
+                      obscurePassword,
+                  decoration:
+                      const InputDecoration(
+                    labelText:
+                        'Confirmar contraseña',
                     prefixIcon:
-                        Icon(Icons.lock_outline),
+                        Icon(
+                      Icons.lock_outline,
+                    ),
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(
+                  height: 24,
+                ),
 
                 SizedBox(
                   height: 52,
                   child: FilledButton(
-                    onPressed: authState.isLoading
-                        ? null
-                        : _register,
-                    child: authState.isLoading
-                        ? const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child:
-                                CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text(
-                            'Crear cuenta',
-                          ),
+                    onPressed:
+                        authState.isLoading
+                            ? null
+                            : _register,
+                    child:
+                        authState.isLoading
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child:
+                                    CircularProgressIndicator(
+                                  strokeWidth:
+                                      2,
+                                  color:
+                                      Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                'Crear cuenta',
+                              ),
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(
+                  height: 16,
+                ),
 
                 TextButton(
                   onPressed: () {
-                    context.go('/login');
+                    context.go(
+                      '/login',
+                    );
                   },
-                  child: const Text(
+                  child:
+                      const Text(
                     'Ya tengo una cuenta',
                   ),
                 ),

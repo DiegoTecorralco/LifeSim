@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../providers/auth_provider.dart';
 
-class ProfilePage extends ConsumerWidget {
+class ProfilePage
+    extends ConsumerWidget {
   const ProfilePage({super.key});
 
   @override
@@ -12,55 +13,111 @@ class ProfilePage extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) {
-    final user = ref.watch(authProvider).value;
+    final user =
+        ref.watch(authProvider).value;
+
+    final fullName =
+        user?.fullName?.isNotEmpty == true
+            ? user!.fullName!
+            : 'No disponible';
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mi perfil'),
+        title:
+            const Text('Mi perfil'),
       ),
       body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+        child:
+            SingleChildScrollView(
+          padding:
+              const EdgeInsets.all(24),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(
+            constraints:
+                const BoxConstraints(
               maxWidth: 600,
             ),
             child: Column(
               children: [
                 const CircleAvatar(
                   radius: 55,
-                  backgroundColor: Colors.indigo,
+                  backgroundColor:
+                      Colors.indigo,
                   child: Icon(
                     Icons.person,
                     size: 60,
-                    color: Colors.white,
+                    color:
+                        Colors.white,
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(
+                  height: 24,
+                ),
 
-                const Text(
-                  'Mi perfil',
-                  style: TextStyle(
+                Text(
+                  fullName,
+                  style:
+                      const TextStyle(
                     fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                    fontWeight:
+                        FontWeight.bold,
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(
+                  height: 8,
+                ),
+
+                Text(
+                  user?.email ??
+                      'No disponible',
+                  style:
+                      const TextStyle(
+                    color:
+                        Colors.grey,
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 30,
+                ),
 
                 Card(
                   elevation: 0,
                   child: Column(
                     children: [
                       ListTile(
-                        leading: const Icon(
-                          Icons.email_outlined,
+                        leading:
+                            const Icon(
+                          Icons
+                              .person_outline,
                         ),
-                        title: const Text(
+                        title:
+                            const Text(
+                          'Nombre completo',
+                        ),
+                        subtitle:
+                            Text(
+                          fullName,
+                        ),
+                      ),
+
+                      const Divider(
+                        height: 1,
+                      ),
+
+                      ListTile(
+                        leading:
+                            const Icon(
+                          Icons
+                              .email_outlined,
+                        ),
+                        title:
+                            const Text(
                           'Correo electrónico',
                         ),
-                        subtitle: Text(
+                        subtitle:
+                            Text(
                           user?.email ??
                               'No disponible',
                         ),
@@ -71,13 +128,17 @@ class ProfilePage extends ConsumerWidget {
                       ),
 
                       ListTile(
-                        leading: const Icon(
-                          Icons.badge_outlined,
+                        leading:
+                            const Icon(
+                          Icons
+                              .badge_outlined,
                         ),
-                        title: const Text(
+                        title:
+                            const Text(
                           'ID de usuario',
                         ),
-                        subtitle: Text(
+                        subtitle:
+                            Text(
                           user?.id ??
                               'No disponible',
                         ),
@@ -86,43 +147,66 @@ class ProfilePage extends ConsumerWidget {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(
+                  height: 24,
+                ),
 
                 SizedBox(
-                  width: double.infinity,
+                  width:
+                      double.infinity,
                   height: 50,
-                  child: OutlinedButton.icon(
+                  child:
+                      OutlinedButton.icon(
                     onPressed: () {
-                      context.go('/dashboard');
+                      context.go(
+                        '/dashboard',
+                      );
                     },
-                    icon: const Icon(
+                    icon:
+                        const Icon(
                       Icons.arrow_back,
                     ),
-                    label: const Text(
+                    label:
+                        const Text(
                       'Volver al dashboard',
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(
+                  height: 12,
+                ),
 
                 SizedBox(
-                  width: double.infinity,
+                  width:
+                      double.infinity,
                   height: 50,
-                  child: FilledButton.icon(
-                    onPressed: () async {
+                  child:
+                      FilledButton.icon(
+                    onPressed:
+                        () async {
                       await ref
-                          .read(authProvider.notifier)
+                          .read(
+                            authProvider
+                                .notifier,
+                          )
                           .logout();
 
-                      if (!context.mounted) return;
+                      if (!context
+                          .mounted) {
+                        return;
+                      }
 
-                      context.go('/login');
+                      context.go(
+                        '/login',
+                      );
                     },
-                    icon: const Icon(
+                    icon:
+                        const Icon(
                       Icons.logout,
                     ),
-                    label: const Text(
+                    label:
+                        const Text(
                       'Cerrar sesión',
                     ),
                   ),

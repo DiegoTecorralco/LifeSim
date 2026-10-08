@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
 
-class DashboardPage extends ConsumerWidget {
+class DashboardPage
+    extends ConsumerWidget {
   const DashboardPage({super.key});
 
   @override
@@ -12,14 +13,21 @@ class DashboardPage extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) {
-    final user = ref.watch(authProvider).value;
+    final user =
+        ref.watch(authProvider).value;
+
+    final displayName =
+        user?.fullName?.isNotEmpty == true
+            ? user!.fullName!
+            : 'Usuario';
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'LifeSim',
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight:
+                FontWeight.bold,
           ),
         ),
         actions: [
@@ -37,17 +45,20 @@ class DashboardPage extends ConsumerWidget {
 
       drawer: Drawer(
         child: ListView(
-          padding: EdgeInsets.zero,
+          padding:
+              EdgeInsets.zero,
           children: [
             UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(
+              decoration:
+                  const BoxDecoration(
                 color: Colors.indigo,
               ),
-              accountName: const Text(
-                'Usuario LifeSim',
-              ),
-              accountEmail: Text(
-                user?.email ?? 'Sin correo',
+              accountName:
+                  Text(displayName),
+              accountEmail:
+                  Text(
+                user?.email ??
+                    'Sin correo',
               ),
               currentAccountPicture:
                   const CircleAvatar(
@@ -59,67 +70,103 @@ class DashboardPage extends ConsumerWidget {
             ),
 
             ListTile(
-              leading: const Icon(
-                Icons.dashboard_outlined,
+              leading:
+                  const Icon(
+                Icons
+                    .dashboard_outlined,
               ),
-              title: const Text('Dashboard'),
+              title:
+                  const Text(
+                'Dashboard',
+              ),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(
+                  context,
+                );
               },
             ),
 
             ListTile(
-              leading: const Icon(
-                Icons.person_outline,
+              leading:
+                  const Icon(
+                Icons
+                    .person_outline,
               ),
-              title: const Text('Mi perfil'),
+              title:
+                  const Text(
+                'Mi perfil',
+              ),
               onTap: () {
-                Navigator.pop(context);
-                context.go('/profile');
+                Navigator.pop(
+                  context,
+                );
+
+                context.go(
+                  '/profile',
+                );
               },
             ),
 
             const Divider(),
 
             ListTile(
-              leading: const Icon(
+              leading:
+                  const Icon(
                 Icons.logout,
               ),
-              title: const Text('Cerrar sesión'),
+              title:
+                  const Text(
+                'Cerrar sesión',
+              ),
               onTap: () async {
                 await ref
-                    .read(authProvider.notifier)
+                    .read(
+                      authProvider
+                          .notifier,
+                    )
                     .logout();
 
-                if (!context.mounted) return;
+                if (!context.mounted) {
+                  return;
+                }
 
-                context.go('/login');
+                context.go(
+                  '/login',
+                );
               },
             ),
           ],
         ),
       ),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+      body:
+          SingleChildScrollView(
+        padding:
+            const EdgeInsets.all(24),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(
+            constraints:
+                const BoxConstraints(
               maxWidth: 1100,
             ),
             child: Column(
               crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  CrossAxisAlignment
+                      .start,
               children: [
                 Text(
-                  'Hola, ${user?.email ?? 'usuario'}',
-                  style: const TextStyle(
+                  'Hola, $displayName',
+                  style:
+                      const TextStyle(
                     fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                    fontWeight:
+                        FontWeight.bold,
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(
+                  height: 8,
+                ),
 
                 const Text(
                   '¿Qué decisión quieres simular hoy?',
@@ -129,62 +176,86 @@ class DashboardPage extends ConsumerWidget {
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(
+                  height: 32,
+                ),
 
                 SizedBox(
-                  width: double.infinity,
+                  width:
+                      double.infinity,
                   child: Card(
                     elevation: 0,
                     child: Padding(
-                      padding: const EdgeInsets.all(24),
+                      padding:
+                          const EdgeInsets
+                              .all(24),
                       child: Column(
                         crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                            CrossAxisAlignment
+                                .start,
                         children: [
                           const Icon(
-                            Icons.add_circle_outline,
+                            Icons
+                                .add_circle_outline,
                             size: 45,
-                            color: Colors.indigo,
+                            color:
+                                Colors.indigo,
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(
+                            height: 16,
+                          ),
 
                           const Text(
                             'Nueva decisión',
-                            style: TextStyle(
-                              fontSize: 22,
+                            style:
+                                TextStyle(
+                              fontSize:
+                                  22,
                               fontWeight:
-                                  FontWeight.bold,
+                                  FontWeight
+                                      .bold,
                             ),
                           ),
 
-                          const SizedBox(height: 8),
+                          const SizedBox(
+                            height: 8,
+                          ),
 
                           const Text(
                             'Crea una decisión y posteriormente agrega variables y escenarios para simular sus posibles resultados.',
-                            style: TextStyle(
-                              color: Colors.grey,
+                            style:
+                                TextStyle(
+                              color:
+                                  Colors.grey,
                             ),
                           ),
 
-                          const SizedBox(height: 20),
+                          const SizedBox(
+                            height: 20,
+                          ),
 
-                          FilledButton.icon(
+                          FilledButton
+                              .icon(
                             onPressed: () {
-                              ScaffoldMessenger.of(
+                              ScaffoldMessenger
+                                  .of(
                                 context,
                               ).showSnackBar(
                                 const SnackBar(
-                                  content: Text(
+                                  content:
+                                      Text(
                                     'Módulo de decisiones próximamente',
                                   ),
                                 ),
                               );
                             },
-                            icon: const Icon(
+                            icon:
+                                const Icon(
                               Icons.add,
                             ),
-                            label: const Text(
+                            label:
+                                const Text(
                               'Crear decisión',
                             ),
                           ),
@@ -194,48 +265,68 @@ class DashboardPage extends ConsumerWidget {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(
+                  height: 24,
+                ),
 
                 const Text(
                   'Mis decisiones',
-                  style: TextStyle(
+                  style:
+                      TextStyle(
                     fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                    fontWeight:
+                        FontWeight.bold,
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(
+                  height: 12,
+                ),
 
                 Card(
                   elevation: 0,
                   child: Padding(
-                    padding: const EdgeInsets.all(32),
+                    padding:
+                        const EdgeInsets
+                            .all(32),
                     child: Center(
                       child: Column(
                         children: [
                           Icon(
-                            Icons.inbox_outlined,
+                            Icons
+                                .inbox_outlined,
                             size: 55,
-                            color: Colors.grey.shade400,
+                            color:
+                                Colors.grey
+                                    .shade400,
                           ),
 
-                          const SizedBox(height: 12),
+                          const SizedBox(
+                            height: 12,
+                          ),
 
                           const Text(
                             'Todavía no tienes decisiones',
-                            style: TextStyle(
-                              fontSize: 16,
+                            style:
+                                TextStyle(
+                              fontSize:
+                                  16,
                               fontWeight:
-                                  FontWeight.w600,
+                                  FontWeight
+                                      .w600,
                             ),
                           ),
 
-                          const SizedBox(height: 6),
+                          const SizedBox(
+                            height: 6,
+                          ),
 
                           const Text(
                             'Tus decisiones aparecerán aquí.',
-                            style: TextStyle(
-                              color: Colors.grey,
+                            style:
+                                TextStyle(
+                              color:
+                                  Colors.grey,
                             ),
                           ),
                         ],

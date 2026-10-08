@@ -1,4 +1,5 @@
-import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
+import 'package:supabase_flutter/supabase_flutter.dart'
+    as supabase;
 
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -12,10 +13,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<User?> register({
+    required String fullName,
     required String email,
     required String password,
   }) async {
     final response = await _dataSource.register(
+      fullName: fullName,
       email: email,
       password: password,
     );
@@ -60,7 +63,8 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   User? getCurrentUser() {
-    final user = supabase.Supabase.instance.client.auth.currentUser;
+    final user =
+        supabase.Supabase.instance.client.auth.currentUser;
 
     if (user == null) {
       return null;

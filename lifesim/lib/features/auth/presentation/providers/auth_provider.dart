@@ -5,11 +5,13 @@ import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 
-final authDataSourceProvider = Provider<AuthDataSource>(
+final authDataSourceProvider =
+    Provider<AuthDataSource>(
   (ref) => AuthDataSource(),
 );
 
-final authRepositoryProvider = Provider<AuthRepository>(
+final authRepositoryProvider =
+    Provider<AuthRepository>(
   (ref) {
     return AuthRepositoryImpl(
       ref.read(authDataSourceProvider),
@@ -18,7 +20,9 @@ final authRepositoryProvider = Provider<AuthRepository>(
 );
 
 final authProvider =
-    NotifierProvider<AuthNotifier, AsyncValue<User?>>(
+    NotifierProvider<
+        AuthNotifier,
+        AsyncValue<User?>>(
   AuthNotifier.new,
 );
 
@@ -28,7 +32,8 @@ class AuthNotifier
 
   @override
   AsyncValue<User?> build() {
-    _repository = ref.read(authRepositoryProvider);
+    _repository =
+        ref.read(authRepositoryProvider);
 
     return AsyncValue.data(
       _repository.getCurrentUser(),
@@ -36,13 +41,16 @@ class AuthNotifier
   }
 
   Future<void> register({
+    required String fullName,
     required String email,
     required String password,
   }) async {
     state = const AsyncValue.loading();
 
     try {
-      final user = await _repository.register(
+      final user =
+          await _repository.register(
+        fullName: fullName,
         email: email,
         password: password,
       );
@@ -63,7 +71,8 @@ class AuthNotifier
     state = const AsyncValue.loading();
 
     try {
-      final user = await _repository.login(
+      final user =
+          await _repository.login(
         email: email,
         password: password,
       );
@@ -86,6 +95,8 @@ class AuthNotifier
   Future<void> resetPassword(
     String email,
   ) async {
-    await _repository.resetPassword(email);
+    await _repository.resetPassword(
+      email,
+    );
   }
 }
