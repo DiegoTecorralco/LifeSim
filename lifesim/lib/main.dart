@@ -8,8 +8,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
-    url: 'https://lwoiwbedaiqssiqxhhvz.supabase.co',
-    publishableKey: 'sb_publishable_16ZBEInGe9bH5nZJkLBKiA_5Djf1UoL',
+    url:
+        'https://lwoiwbedaiqssiqxhhvz.supabase.co',
+    publishableKey:
+        'sb_publishable_16ZBEInGe9bH5nZJkLBKiA_5Djf1UoL',
   );
 
   runApp(
@@ -19,41 +21,77 @@ Future<void> main() async {
   );
 }
 
-class LifeSimApp extends StatelessWidget {
+class LifeSimApp
+    extends StatelessWidget {
   const LifeSimApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     return MaterialApp.router(
       title: 'LifeSim',
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner:
+          false,
+
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.indigo,
+
+        colorScheme:
+            ColorScheme.fromSeed(
+          seedColor:
+              Colors.indigo,
         ),
-        scaffoldBackgroundColor: const Color(0xFFF7F8FC),
-        inputDecorationTheme: InputDecorationTheme(
+
+        scaffoldBackgroundColor:
+            const Color(
+          0xFFF7F8FC,
+        ),
+
+        inputDecorationTheme:
+            InputDecorationTheme(
           filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
+          fillColor:
+              Colors.white,
+
+          border:
+              OutlineInputBorder(
+            borderRadius:
+                BorderRadius.circular(
+              14,
+            ),
+            borderSide:
+                BorderSide.none,
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
+
+          enabledBorder:
+              OutlineInputBorder(
+            borderRadius:
+                BorderRadius.circular(
+              14,
+            ),
+            borderSide:
+                BorderSide.none,
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(
-              color: Colors.indigo,
+
+          focusedBorder:
+              OutlineInputBorder(
+            borderRadius:
+                BorderRadius.circular(
+              14,
+            ),
+            borderSide:
+                const BorderSide(
+              color:
+                  Colors.indigo,
               width: 2,
             ),
           ),
         ),
       ),
-      routerConfig: appRouter,
+
+      routerConfig:
+          appRouter,
     );
   }
 }

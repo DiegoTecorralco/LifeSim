@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class SplashPage extends StatefulWidget {
+class SplashPage
+    extends StatefulWidget {
   const SplashPage({super.key});
 
   @override
-  State<SplashPage> createState() => _SplashPageState();
+  State<SplashPage> createState() =>
+      _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> {
+class _SplashPageState
+    extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
+
     _checkSession();
   }
 
@@ -38,14 +42,19 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment:
+              MainAxisAlignment.center,
           children: [
             Container(
               width: 90,
               height: 90,
-              decoration: BoxDecoration(
+              decoration:
+                  BoxDecoration(
                 color: Colors.indigo,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius:
+                    BorderRadius.circular(
+                  24,
+                ),
               ),
               child: const Icon(
                 Icons.psychology_alt,
@@ -54,17 +63,22 @@ class _SplashPageState extends State<SplashPage> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(
+              height: 24,
+            ),
 
             const Text(
               'LifeSim',
               style: TextStyle(
                 fontSize: 32,
-                fontWeight: FontWeight.bold,
+                fontWeight:
+                    FontWeight.bold,
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(
+              height: 8,
+            ),
 
             const Text(
               'Simula tus decisiones',
@@ -74,12 +88,15 @@ class _SplashPageState extends State<SplashPage> {
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(
+              height: 30,
+            ),
 
             const SizedBox(
               width: 30,
               height: 30,
-              child: CircularProgressIndicator(
+              child:
+                  CircularProgressIndicator(
                 strokeWidth: 3,
               ),
             ),
