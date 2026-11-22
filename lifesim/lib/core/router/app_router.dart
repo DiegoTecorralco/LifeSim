@@ -1,6 +1,3 @@
-
-
-
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
@@ -14,6 +11,7 @@ import '../../features/decisions/presentation/pages/decisions_page.dart';
 import '../../features/decisions/presentation/pages/edit_decision_page.dart';
 import '../../features/variables/presentation/pages/variables_page.dart';
 import '../../features/scenarios/presentation/pages/scenarios_page.dart';
+import '../../features/simulation/presentation/pages/simulation_page.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -105,6 +103,19 @@ final GoRouter appRouter = GoRouter(
 
         return ScenariosPage(
           decision: decision,
+        );
+      },
+    ),
+
+    // SIMULACIÓN DE UNA DECISIÓN
+    GoRoute(
+      path: '/decisions/simulate',
+      builder: (context, state) {
+        final data = state.extra as Map<String, dynamic>;
+
+        return SimulationPage(
+          decision: data['decision'] as Map<String, dynamic>,
+          initialScenarioId: data['scenario_id']?.toString(),
         );
       },
     ),

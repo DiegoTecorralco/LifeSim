@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ScenariosPage extends StatefulWidget {
@@ -632,13 +633,32 @@ class _ScenariosPageState extends State<ScenariosPage> {
                                       'Sin descripción',
                                 ),
                               ),
-                              trailing: FilledButton.tonalIcon(
-                                onPressed: () {
-                                  _configureScenario(scenario);
-                                },
-                                icon: const Icon(Icons.tune),
-                                label: const Text('Configurar'),
-                              ),
+                                  trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton.filled(
+                                      tooltip: 'Simular',
+                                      icon: const Icon(Icons.play_arrow),
+                                      onPressed: () {
+                                        context.push(
+                                          '/decisions/simulate',
+                                          extra: {
+                                            'decision': widget.decision,
+                                            'scenario_id': scenario['id'].toString(),
+                                          },
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(width: 8),
+                                    FilledButton.tonalIcon(
+                                      onPressed: () {
+                                        _configureScenario(scenario);
+                                      },
+                                      icon: const Icon(Icons.tune),
+                                      label: const Text('Configurar'),
+                                    ),
+                                  ],
+                                ),
                             ),
                           );
                         },
