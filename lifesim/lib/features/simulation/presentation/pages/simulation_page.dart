@@ -39,6 +39,12 @@ class _SimulationPageState extends State<SimulationPage> {
   SimulationResult? _result;
   DateTime? _finishedAt;
 
+  // GUARDADO
+  List<SimulationVariable> _lastVariables = [];
+  String? _resultScenarioId;
+  bool _saving = false;
+  DateTime? _savedAt;
+
   @override
   void initState() {
     super.initState();
@@ -122,6 +128,7 @@ class _SimulationPageState extends State<SimulationPage> {
     setState(() {
       _running = true;
       _result = null;
+      _savedAt = null;
       _error = null;
     });
 
@@ -147,6 +154,8 @@ class _SimulationPageState extends State<SimulationPage> {
 
       setState(() {
         _result = result;
+        _lastVariables = variables;
+        _resultScenarioId = _scenarioId;
         _finishedAt = DateTime.now();
         _running = false;
       });
@@ -170,6 +179,67 @@ class _SimulationPageState extends State<SimulationPage> {
         _running = false;
       });
     }
+  }
+
+  // GUARDAR SIMULACIÓN
+  Future<void> _saveSimulation() async {
+    final result = _result;
+    final scenarioId = _resultScenarioId;
+
+    if (result == null ||
+        scenarioId == null ||
+        _saving ||
+        _savedAt != null) {
+      return;
+    }
+
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+
+    try {
+      // Resultado + variables usadas (el escenario puede cambiar después).
+      final payload = {
+        ...result.toMap(),
+        'inputs': [for (final v in _lastVariables) v.toMap()],
+      };
+
+      final saved = await _repository.saveSimulation(
+        scenarioId: scenarioId,
+        iterations: result.iterations,
+        result: payload,
+      );
+
+      if (!mounted) return;
+
+      final createdAt =
+          DateTime.tryParse('${saved['created_at']}')?.toLocal() ??
+              DateTime.now();
+
+      setState(() {
+        _savedAt = createdAt;
+        _saving = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Simulación guardada correctamente.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _error = 'No se pudo guardar la simulación: $error';
+      });
+    }
+  }
+
+  String _formatDate(DateTime d) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(d.day)}/${two(d.month)}/${d.year} ${two(d.hour)}:${two(d.minute)}';
   }
 
   // FORMATO DE NÚMEROS: 12,345.67
@@ -496,6 +566,44 @@ class _SimulationPageState extends State<SimulationPage> {
         'que definiste. No son una predicción garantizada.',
         style: TextStyle(color: Colors.grey, fontSize: 12),
       ),
+      const SizedBox(height: 20),
+
+      // GUARDAR
+      if (_savedAt != null)
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.blue.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.save, color: Colors.blue),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Simulación guardada el ${_formatDate(_savedAt!)}.',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        )
+      else
+        SizedBox(
+          height: 48,
+          child: FilledButton.tonalIcon(
+            onPressed: _saving ? null : _saveSimulation,
+            icon: _saving
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.save_outlined),
+            label: Text(_saving ? 'Guardando...' : 'Guardar simulación'),
+          ),
+        ),
     ];
   }
 

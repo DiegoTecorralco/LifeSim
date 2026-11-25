@@ -47,6 +47,17 @@ class SimulationVariable {
     );
   }
 
+  /// Datos de la variable tal como se usaron en la simulación.
+  Map<String, dynamic> toMap() => {
+        'variable_id': id,
+        'name': name,
+        'unit': unit,
+        'min_value': minValue,
+        'max_value': maxValue,
+        'value': value,
+        'sign': sign,
+      };
+
   static double _toDouble(Object? raw) {
     if (raw is num) return raw.toDouble();
     return double.parse(raw.toString().trim());

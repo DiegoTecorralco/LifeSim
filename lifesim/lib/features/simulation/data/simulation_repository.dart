@@ -62,4 +62,24 @@ class SimulationRepository {
       values: values,
     );
   }
+
+  /// Guarda una simulación en la tabla `simulations` y devuelve la fila
+  /// creada (id y fecha de registro).
+  Future<Map<String, dynamic>> saveSimulation({
+    required Object scenarioId,
+    required int iterations,
+    required Map<String, dynamic> result,
+  }) async {
+    final response = await _client
+        .from('simulations')
+        .insert({
+          'scenario_id': scenarioId,
+          'iterations': iterations,
+          'result': result,
+        })
+        .select('id, created_at')
+        .single();
+
+    return Map<String, dynamic>.from(response);
+  }
 }
