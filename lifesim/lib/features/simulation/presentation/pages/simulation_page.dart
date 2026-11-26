@@ -4,6 +4,9 @@ import '../../data/simulation_repository.dart';
 import '../../domain/simulation_engine.dart';
 import '../../domain/simulation_result.dart';
 import '../../domain/simulation_variable.dart';
+import '../widgets/distribution_chart.dart';
+import '../widgets/result_range_chart.dart';
+import '../widgets/variable_contribution_chart.dart';
 
 class SimulationPage extends StatefulWidget {
   final Map<String, dynamic> decision;
@@ -546,20 +549,149 @@ class _SimulationPageState extends State<SimulationPage> {
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
       const SizedBox(height: 12),
+
+      // RESULTADO PRINCIPAL
+      Card(
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Resultado estimado',
+                style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                _fmt(stats.mean),
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Es el promedio de ${result.iterations} simulaciones. '
+                'En 8 de cada 10 casos el resultado queda entre '
+                '${_fmt(stats.p10)} y ${_fmt(stats.p90)}. '
+                'Los valores extremos simulados van de ${_fmt(stats.min)} '
+                'a ${_fmt(stats.max)}.',
+              ),
+            ],
+          ),
+        ),
+      ),
+      const SizedBox(height: 12),
       Wrap(
         spacing: 12,
         runSpacing: 12,
         children: [
-          _statCard('Promedio', stats.mean, highlight: true),
-          _statCard('Mediana', stats.median),
-          _statCard('Valor base', result.baseValue),
-          _statCard('Mínimo', stats.min),
-          _statCard('Máximo', stats.max),
-          _statCard('Percentil 10', stats.p10),
-          _statCard('Percentil 90', stats.p90),
-          _statCard('Desviación', stats.stdDev),
+          _statCard('Promedio', stats.mean,
+              hint: 'Valor central de todas las simulaciones'),
+          _statCard('Mínimo', stats.min,
+              hint: 'El valor más bajo simulado'),
+          _statCard('Máximo', stats.max,
+              hint: 'El valor más alto simulado'),
+          _statCard('Mediana', stats.median,
+              hint: 'La mitad quedó por debajo'),
+          _statCard('Valor base', result.baseValue,
+              hint: 'Con los valores exactos del escenario'),
+          _statCard('Percentil 10', stats.p10,
+              hint: 'El 10% quedó por debajo'),
+          _statCard('Percentil 90', stats.p90,
+              hint: 'El 10% quedó por encima'),
+          _statCard('Desviación', stats.stdDev,
+              hint: 'Qué tanto varían los resultados'),
         ],
       ),
+
+      // GRÁFICAS
+      const SizedBox(height: 28),
+      const Text(
+        'Gráficas',
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 4),
+      const Text(
+        'Hechas con los datos de esta simulación.',
+        style: TextStyle(color: Colors.grey),
+      ),
+
+      // 1. Distribución
+      const SizedBox(height: 20),
+      const Text(
+        'Distribución de resultados',
+        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 4),
+      const Text(
+        'Cuántas simulaciones cayeron en cada rango de resultado. '
+        'Pasa el cursor sobre una barra para ver el detalle.',
+        style: TextStyle(color: Colors.grey),
+      ),
+      const SizedBox(height: 16),
+      DistributionChart(
+        bins: result.histogram,
+        mean: stats.mean,
+        format: _fmt,
+      ),
+
+      // 2. Rango de resultados
+      const SizedBox(height: 28),
+      const Text(
+        'Rango de resultados',
+        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 4),
+      const Text(
+        'De los valores más bajos a los más altos simulados, con la zona '
+        'donde cayó la mayoría de los casos.',
+        style: TextStyle(color: Colors.grey),
+      ),
+      const SizedBox(height: 16),
+      ResultRangeChart(
+        min: stats.min,
+        max: stats.max,
+        p10: stats.p10,
+        p90: stats.p90,
+        median: stats.median,
+        mean: stats.mean,
+        baseValue: result.baseValue,
+        format: _fmt,
+      ),
+
+      // 3. Aporte de cada variable
+      if (_lastVariables.length == result.variables.length) ...[
+        const SizedBox(height: 28),
+        const Text(
+          'Aporte de cada variable',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          'Cuánto suma o resta, en promedio, cada variable al resultado.',
+          style: TextStyle(color: Colors.grey),
+        ),
+        const SizedBox(height: 16),
+        VariableContributionChart(
+          items: [
+            for (var i = 0; i < _lastVariables.length; i++)
+              ContributionItem(
+                name: _lastVariables[i].name,
+                value: _lastVariables[i].sign *
+                    result.variables[i].stats.mean,
+              ),
+          ],
+          format: _fmt,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'La suma de los aportes es ${_fmt(_contributionsTotal(result))}, '
+          'igual al promedio del resultado.',
+          style: const TextStyle(color: Colors.grey, fontSize: 12),
+        ),
+      ],
       const SizedBox(height: 12),
       const Text(
         'Estos valores son estimaciones basadas en las variables y rangos '
@@ -607,13 +739,19 @@ class _SimulationPageState extends State<SimulationPage> {
     ];
   }
 
-  Widget _statCard(String label, double value, {bool highlight = false}) {
-    final color = Theme.of(context).colorScheme.primary;
+  /// Suma de los aportes (signo x promedio) de todas las variables.
+  double _contributionsTotal(SimulationResult result) {
+    var total = 0.0;
+    for (var i = 0; i < _lastVariables.length; i++) {
+      total += _lastVariables[i].sign * result.variables[i].stats.mean;
+    }
+    return total;
+  }
 
+  Widget _statCard(String label, double value, {String? hint}) {
     return SizedBox(
       width: 200,
       child: Card(
-        color: highlight ? color.withValues(alpha: 0.1) : null,
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
@@ -623,12 +761,18 @@ class _SimulationPageState extends State<SimulationPage> {
               const SizedBox(height: 6),
               Text(
                 _fmt(value),
-                style: TextStyle(
-                  fontSize: highlight ? 22 : 18,
+                style: const TextStyle(
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: highlight ? color : null,
                 ),
               ),
+              if (hint != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  hint,
+                  style: const TextStyle(color: Colors.grey, fontSize: 11),
+                ),
+              ],
             ],
           ),
         ),
